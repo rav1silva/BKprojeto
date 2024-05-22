@@ -7,7 +7,9 @@ import 'package:ravi_desafio/widgets/step_by_step.dart';
 import '../theme/font.dart';
 
 class QuestionScreen extends StatefulWidget {
-  const QuestionScreen({super.key});
+  var arrayData;
+
+  QuestionScreen({super.key, required this.arrayData});
 
   @override
   State<QuestionScreen> createState() => _QuestionScreenState();
@@ -18,28 +20,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
   int _step = 0;
 
   String questionCurrent = '';
-  final String _question1 =
-      'Você e um colega estão trocando e-mails sobre um novo projeto. De repente, seu colega envia um e-mail com várias dúvidas e preocupações não relacionadas ao tópico. Qual das alternativas a seguir é um próximo passo recomendado para um bom ouvinte?';
-  final String _question2 =
-      'Você e sua chefe estão com alguma dificuldade de se encontrarem pessoalmente em um projeto. Qual seria o melhor contexto para resolver seu conflito?';
+  String _question1 = '';
+  String _question2 = '';
 
-  final int _numberResponseCorrectQuestion1 = 2;
-  final int _numberResponseCorrectQuestion2 = 3;
+  int _numberResponseCorrectQuestion1 = 2;
+  int _numberResponseCorrectQuestion2 = 3;
 
   late List<String> responsesCurrent;
-  final List<String> _responses1 = [
-    "Responder ao e-mail tentando resolver algumas das preocupações",
-    "Informar seu supervisor para que ele resolva o problema",
-    "Ligar para o colega e conversar por telefone",
-    "Ignorar o e-mail. Você tem um plano e deve segui-lo"
-  ];
+  List<String> _responses1 = [];
 
-  final List<String> _responses2 = [
-    "Um telefonema para um bate-papo oportuno, sabendo que ela está dirigindo para um congresso",
-    "Uma conversa improvisada durante um trabalho de assessoria",
-    "Um e-mail apresentando seu ponto de vista e pedindo uma resposta",
-    "Um e-mail seu perguntando sobre o melhor momento, nos próximos dias, para discutirem a questão pessoalmente"
-  ];
+  List<String> _responses2 = [];
 
   int? responseCurrent;
   int? responseQuestion1;
@@ -48,6 +38,24 @@ class _QuestionScreenState extends State<QuestionScreen> {
   @override
   void initState() {
     super.initState();
+
+    _question1 = widget.arrayData[0]["pergunta"];
+    _question2 = widget.arrayData[1]["pergunta"];
+
+    List respostas = widget.arrayData[0]["respostas"];
+    for (int i = 0; i < respostas.length; i++) {
+      _responses1.add(respostas[i]["resposta"]);
+      if (respostas[i]["correta"] == true) {
+        _numberResponseCorrectQuestion1 = i;
+      }
+    }
+    respostas = widget.arrayData[1]["respostas"];
+    for (int i = 0; i < respostas.length; i++) {
+      _responses2.add(respostas[i]["resposta"]);
+      if (respostas[i]["correta"] == true) {
+        _numberResponseCorrectQuestion2 = i;
+      }
+    }
 
     questionCurrent = _question1;
     responsesCurrent = _responses1;
@@ -152,11 +160,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
                     } else if (responseQuestion2 == null) {
                       responseQuestion2 = responseCurrent;
 
-                      if (responseQuestion1 == _numberResponseCorrectQuestion1) {
+                      if (responseQuestion1 ==
+                          _numberResponseCorrectQuestion1) {
                         pontuation += 50;
                       }
 
-                      if (responseQuestion2 == _numberResponseCorrectQuestion2) {
+                      if (responseQuestion2 ==
+                          _numberResponseCorrectQuestion2) {
                         pontuation += 50;
                       }
 

@@ -4,6 +4,8 @@ import 'package:ravi_desafio/theme/pallete.dart';
 import 'package:ravi_desafio/widgets/button_back.dart';
 import 'package:ravi_desafio/widgets/step_by_step.dart';
 
+import '../helpers/dio.dart';
+import '../helpers/helper_pref.dart';
 import '../theme/font.dart';
 import '../widgets/button_default.dart';
 import '../widgets/text_field.dart';
@@ -16,6 +18,13 @@ class RegistrationScreenThird extends StatefulWidget {
 }
 
 class _RegistrationScreenState extends State<RegistrationScreenThird> {
+  final _academicEducationController = TextEditingController();
+  final _academicStatusController = TextEditingController();
+  final _interestAreaController = TextEditingController();
+  final _strongPointsController = TextEditingController();
+  final _developSkillsController = TextEditingController();
+  final _supportController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,46 +82,77 @@ class _RegistrationScreenState extends State<RegistrationScreenThird> {
                     const SizedBox(height: 32),
                     CustomTextField(
                       labelText: 'Qual área de atuação você se interessa?',
-                      controller: TextEditingController(),
+                      controller: _academicEducationController,
                       width: double.infinity,
                     ),
                     const SizedBox(height: 24),
                     CustomTextField(
                       labelText: 'Quais são seus objetivos na empresa?',
-                      controller: TextEditingController(),
+                      controller: _academicStatusController,
                       width: double.infinity,
                     ),
                     const SizedBox(height: 24),
                     CustomTextField(
                       labelText: 'Quais os seus pontos fortes?',
-                      controller: TextEditingController(),
+                      controller: _strongPointsController,
                       width: double.infinity,
                     ),
                     const SizedBox(height: 24),
                     CustomTextField(
                       labelText: 'Quais as habilidades você gostaria de desenvolver?',
-                      controller: TextEditingController(),
+                      controller: _developSkillsController,
                       width: double.infinity,
                     ),
                     const SizedBox(height: 24),
                     CustomTextField(
                       labelText: 'Quais suportes são necessários para seus objetivos?',
-                      controller: TextEditingController(),
+                      controller: _supportController,
                       width: double.infinity,
                     ),
                     const SizedBox(height: 40),
                     ButtonDefault(
                       text: 'Continuar',
                       width: double.infinity,
-                      onPressed: () {
-                        // ignore: avoid_print
-                        print('registro feito com sucesso');
+                      onPressed: () async {
+                        var dioClient = DioClient();
+                        var idDto1 = await HelperPref.getIdDto1();
+                        var token = await HelperPref.getToken();
 
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
-                        );
+                        dioClient.dio.options.headers = {
+                          'Authorization': 'Bearer $token',
+                        };
+
+                        dioClient.dio.post('/infoUsers/$idDto1/part2', data: {
+                          'academic_education': _academicEducationController.text,
+                          'academic_status': _academicStatusController.text,
+                          'interest_area': _interestAreaController.text,
+                          'strong_points': _strongPointsController.text,
+                          'develop_skills': _developSkillsController.text,
+                          'support': _supportController.text
+                        }).then((response) async {
+                          if (response.statusCode == 201) {
+                            const snackBar = SnackBar(
+                              content: Text('Respostas cadastradas com sucesso!'),
+                              backgroundColor: Colors.green,
+                            );
+
+                            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LoginScreen()),
+                            );
+                          }
+                        }).catchError((error) {
+                          final snackBar = SnackBar(
+                            content: Text('Ops! Error: ${error.response?.data['message']}'),
+                            backgroundColor: Colors.redAccent,
+                            duration: const Duration(seconds: 5),
+                          );
+
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        });
                       },
                     ),
                     Padding(

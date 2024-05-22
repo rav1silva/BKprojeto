@@ -7,17 +7,18 @@ class CardStatistics extends StatelessWidget {
   final String title;
   final String subtitle;
   final String image;
+  final double width;
 
   const CardStatistics(
       {super.key,
       required this.title,
       required this.subtitle,
-      required this.image});
+      required this.image, this.width = 172});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 172,
+      width: width,
       height: 68,
       decoration: BoxDecoration(
         color: Pallete.whiteColor,
@@ -38,7 +39,7 @@ class CardStatistics extends StatelessWidget {
                   title,
                   style: const TextStyle(
                     color: Pallete.textPrimaryColor,
-                    fontSize: Font.size16,
+                    fontSize: Font.size14,
                     fontFamily: Font.flame,
                   ),
                 ),
@@ -46,7 +47,7 @@ class CardStatistics extends StatelessWidget {
                   subtitle,
                   style: const TextStyle(
                     color: Pallete.textPrimaryColor,
-                    fontSize: Font.size16,
+                    fontSize: Font.size14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

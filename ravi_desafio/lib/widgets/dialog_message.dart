@@ -1,3 +1,4 @@
+import 'package:ravi_desafio/helpers/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:ravi_desafio/screens/question_screen.dart';
 import 'package:ravi_desafio/theme/pallete.dart';
@@ -62,10 +63,25 @@ class _DialogMessageState extends State<DialogMessage> {
               ),
             ),
           ),
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return const QuestionScreen();
-            }));
+          onPressed: () async {
+            var dioClient = DioClient();
+
+            dioClient.dio.get('/questions').then((response) {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return QuestionScreen(arrayData: response.data,);
+              }));
+            }).catchError((error) {
+              print("Erro: ${error}");
+              const snackBar = SnackBar(
+                content: Text(
+                    'Ops! Error: não foi possível buscar as perguntas'),
+                backgroundColor: Colors.redAccent,
+                duration: Duration(seconds: 5),
+              );
+
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(snackBar);
+            });
           },
         ),
       ],

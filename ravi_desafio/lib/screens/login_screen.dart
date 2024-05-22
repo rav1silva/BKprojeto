@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:ravi_desafio/helpers/helper_pref.dart';
 import 'package:ravi_desafio/theme/font.dart';
 import 'package:ravi_desafio/theme/pallete.dart';
 import 'package:ravi_desafio/widgets/button_default.dart';
@@ -54,7 +56,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: 40, left: 16, right: 16),
+                    padding:
+                        const EdgeInsets.only(top: 40, left: 16, right: 16),
                     child: Column(
                       children: [
                         const Align(
@@ -82,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             CustomTextField(
                               labelText: 'Informe seu e-mail ou CPF',
                               controller: _emailCPFController,
+                              width: MediaQuery.of(context).size.width - 72,
                             ),
                           ],
                         ),
@@ -99,6 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             CustomTextField(
                               labelText: 'E sua senha',
                               controller: _passwordController,
+                              width: MediaQuery.of(context).size.width - 72,
                               obscureText: true,
                             ),
                           ],
@@ -108,8 +113,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           text: 'Entrar',
                           width: double.infinity,
                           onPressed: () {
-                            if(_emailCPFController.text.isEmpty || _passwordController.text.isEmpty) {
-
+                            if (_emailCPFController.text.isEmpty ||
+                                _passwordController.text.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Preencha todos os campos'),
@@ -132,7 +137,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                   backgroundColor: Colors.green,
                                 );
 
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                var token = response.data['access_token'];
+
+                                HelperPref.saveToken(token);
+                                Map<String, dynamic> tokenDecoded =
+                                    JwtDecoder.decode(token);
+                                HelperPref.saveId(tokenDecoded['sub']);
+
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
 
                                 Navigator.push(
                                   context,
@@ -141,13 +154,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 );
                               }
                             }).catchError((error) {
+                              print("Erro: ${error}");
                               final snackBar = SnackBar(
-                                content: Text('Ops! Error: ${error.response?.data['message']}'),
+                                content: Text(
+                                    'Ops! Error: ${error.response?.data['message']}'),
                                 backgroundColor: Colors.redAccent,
                                 duration: const Duration(seconds: 5),
                               );
 
-                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBar);
                             });
                           },
                         ),

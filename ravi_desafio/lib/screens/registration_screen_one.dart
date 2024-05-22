@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:ravi_desafio/helpers/dio.dart';
+import 'package:ravi_desafio/helpers/helper_pref.dart';
 import 'package:ravi_desafio/theme/pallete.dart';
 import 'package:ravi_desafio/widgets/button_back.dart';
 import 'package:ravi_desafio/widgets/select_field.dart';
 import 'package:ravi_desafio/widgets/step_by_step.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../theme/font.dart';
 import '../widgets/button_default.dart';
@@ -147,15 +149,19 @@ class _RegistrationScreenState extends State<RegistrationScreenOne> {
                           'email': _emailController.text,
                           'password': _passwordController.text,
                           'role': _roleController.text,
-                          'branch_company': 'BK',
-
-                        }).then((response) {
-
+                          'branch_company': 'BK'
+                        }).then((response) async {
                           if (response.statusCode == 201) {
                             const snackBar = SnackBar(
                               content: Text('Cadastro feito com sucesso!'),
                               backgroundColor: Colors.green,
                             );
+
+                            var result = await dioClient.login(response.data['email'], _passwordController.text);
+
+                            HelperPref.saveToken(result.data['access_token']);
+                            var idUser = HelperPref.getIdByToken(result.data['access_token']);
+                            HelperPref.saveId(idUser as String);
 
                             ScaffoldMessenger.of(context).showSnackBar(snackBar);
 

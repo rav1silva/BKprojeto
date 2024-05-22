@@ -11,7 +11,18 @@ class DioClient {
 
   final Dio dio = Dio(
     BaseOptions(
-      baseUrl: "http://192.168.10.6:3000",
+      baseUrl: "https://future-burguer-novo.onrender.com",
+      connectTimeout: const Duration(milliseconds: 5000),
+      receiveTimeout: const Duration(milliseconds: 3000),
+      sendTimeout: const Duration(milliseconds: 3000),
     ),
+
   );
+
+  Future<Response> login(String email, String password) async {
+    return await dio.post('/auth/login', data: {
+      'email': email,
+      'password': password
+    });
+  }
 }
